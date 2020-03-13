@@ -3,6 +3,7 @@ var router = express.Router();
 
 var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
   passport.use(new FacebookStrategy({
     clientID: '638229720087425',
@@ -29,7 +30,7 @@ router.get('/login', function(req, res, next) {
 });
 
 
-router.get('/auth/facebook', passport.authenticate('facebook'));
+router.get('/auth/facebook', passport.authenticate('facebook', { scope: 'read_stream' }));
 
 // Facebook will redirect the user to this URL after approval.  Finish the
 // authentication process by attempting to obtain an access token.  If
@@ -40,6 +41,33 @@ router.get('/auth/facebook/callback',passport.authenticate('facebook', {
                                         console.log("PPPPPPPPPPPPPPPPPPPPPPPP",req.user)
                                         res.send("Hello");
                                       });
+
+
+
+  // Google 
+  passport.use(new GoogleStrategy({
+    clientID: '651067110700-u4qbahno8bgvc612rral8bap3q1ajakp.apps.googleusercontent.com',
+    clientSecret: 'tHfXT0Z0ePYF975QL13DVDeB',
+    callbackURL: "https://rajiv-login-fbgt.herokuapp.com/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+
+    console.log(profile)
+    return cb(null,profile)
+  }
+));
+
+
+router.get('/auth/google',
+  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+
+
+router.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    console.log("ppppppppppppp",req.user)
+    res.send("hello");
+  });
 
 
 
