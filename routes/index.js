@@ -4,6 +4,7 @@ var router = express.Router();
 var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 
   passport.use(new FacebookStrategy({
     clientID: '638229720087425',
@@ -64,6 +65,34 @@ router.get('/auth/google',
 
 router.get('/auth/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    console.log("ppppppppppppp",req.user)
+    res.send("hello");
+  });
+
+
+
+  // Twitter 
+
+  passport.use(new TwitterStrategy({
+    consumerKey: 'XjTY2rkQeHoncDo7e3pcspvsi',
+    consumerSecret:'3SzgsXXxTIskUTtVukIZOcLBNovtBOSlZ8DfUcYwxsO4H74iwf',
+    callbackURL: "https://rajiv-login-fbgt.herokuapp.com/auth/twitter/callback"
+  },
+
+  function(accessToken, refreshToken, profile, cb) {
+
+    console.log(profile)
+    return cb(null,profile)
+  }
+));
+
+
+router.get('/auth/twitter', passport.authenticate('twitter'));
+
+
+router.get('/auth/twitter/callback', 
+  passport.authenticate('twitter', { failureRedirect: '/login' }),
   function(req, res) {
     console.log("ppppppppppppp",req.user)
     res.send("hello");
